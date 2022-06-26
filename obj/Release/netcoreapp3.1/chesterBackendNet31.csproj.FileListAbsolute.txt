@@ -40,3 +40,14 @@ D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\obj\Release\netcoreapp
 D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\obj\Release\netcoreapp3.1\chesterBackendNet31.dll
 D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\obj\Release\netcoreapp3.1\chesterBackendNet31.pdb
 D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\obj\Release\netcoreapp3.1\chesterBackendNet31.genruntimeconfig.cache
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\BouncyCastle.Crypto.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\K4os.Compression.LZ4.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\K4os.Compression.LZ4.Streams.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\K4os.Hash.xxHash.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\MySql.Data.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\Ubiety.Dns.Core.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\ZstdNet.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\System.Configuration.ConfigurationManager.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\System.Runtime.CompilerServices.Unsafe.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\System.Security.Cryptography.ProtectedData.dll
+D:\Users\Administrator\Desktop\Backed\chesterBackendNet31\bin\Release\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
