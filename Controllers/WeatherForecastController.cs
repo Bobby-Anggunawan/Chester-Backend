@@ -6,6 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using chesterBackendNet31.Models;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace chesterBackendNet31.Controllers
 {
@@ -100,17 +106,125 @@ namespace chesterBackendNet31.Controllers
             _logger = logger;
         }
 
-        [HttpPost("{userID}")]
-        public String Post(string userID) {
-            var data = new ChesterDatabase.ChesterMySQL().addUser(userID);
-            if (data) return "Berhasil dirambah";
-            return "Gagal dittambah";
+        //dipanggil untuk login
+        [HttpPost]
+        [Route("login/{userID}")]
+        public String UserLogin(string userID) {
+            try {
+                var data = new ChesterDatabase.ChesterMySQL().addUser(userID);
+                if (data) return "user berhasil dirambah";
+                return "user gagal dittambah";
+            }
+            catch(Exception e){
+                return e.Message;
+            }
+        }
+
+        //dipanggil untuk menambah koin
+        [HttpPut]
+        [Route("addCoin/{userID}/{coin:int}")]
+        public String TambahKoinUser(string userID, int coin) {
+            var data = new ChesterDatabase.ChesterMySQL().addUserCoin(userID, coin);
+            if (data) return "koin ditambah";
+            return "koin gagal ditambah";
+        }
+
+
+        [HttpGet]
+        public JsonResult PrintSemuaUser() {
+            var data = new ChesterDatabase.ChesterMySQL().getUser();
+            return new JsonResult(data);
+        }
+    }
+
+    [ApiController]
+    [Route("[controller]")]
+    public class CardController : ControllerBase {
+        [HttpGet("{DeckID}")]
+        public JsonResult GetAllCards(int DeckID) {
+            try
+            {
+                var data = new ChesterDatabase.ChesterMySQL().getAllCards(DeckID);
+                return new JsonResult(data);
+            }
+            catch (Exception e) {
+                var ret = new Dictionary<string, string>() {
+                    {e.GetType().ToString(), e.Message }
+                };
+                return new JsonResult(ret);
+            }
+        }
+
+        [HttpPut]
+        public string UpdateDeck([FromBody] object jsonData) {
+            int debugPos = 0;
+            try
+            {
+                var data = JsonConvert.DeserializeObject<UpdateDeckData>(jsonData.ToString());
+                debugPos = 4;
+                var ret = new ChesterDatabase.ChesterMySQL().updateDeck(data.DeckID, data.data);
+                debugPos = 5;
+                if (ret) return "berhasil";
+                return "gagal";
+            }
+            catch (Exception e) {
+                return $"{jsonData.ToString()}\n\nPosisi debug pos: {debugPos}\n{e.GetType().Name}\n{e.Message}\n{e.StackTrace}";
+            }
+        }
+    }
+
+
+    [ApiController]
+    [Route("[controller]")]
+    public class DeckController : ControllerBase {
+        [HttpGet("{userID}")]
+        public JsonResult getDeckList(string userID)
+        {
+            return new JsonResult(new ChesterDatabase.ChesterMySQL().getAllDeck(userID));
+        }
+
+        [HttpPost]
+        [Route("create/{UserID}/{NamaDeck}")]
+        public string createNewDeck(string UserID, string NamaDeck) {
+            try
+            {
+                bool ret = new ChesterDatabase.ChesterMySQL().addNewDeck(UserID, NamaDeck);
+                if (ret) return "sukses";
+                return "gagal";
+            }
+            catch (Exception e) {
+                return $"{e.GetType().Name}\n{e.Message}\n{e.StackTrace}";
+            }
+        }
+
+    }
+
+    [ApiController]
+    [Route("[controller]")]
+    public class ShopController : ControllerBase {
+        [HttpPut]
+        public string BuyCard([FromBody] object jsonData) {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonData.ToString());
+
+            var ret = new ChesterDatabase.ChesterMySQL().buyCard(Convert.ToString(data["UserID"]),
+                                                                    Convert.ToString(data["CardID"]),
+                                                                    Convert.ToDouble(data["discount"]));
+            if (ret) return "berhasil";
+            else return "gagal";
         }
 
         [HttpGet]
-        public JsonResult Get() {
-            var data = new ChesterDatabase.ChesterMySQL().getUser();
-            return new JsonResult(data);
+        public string GetCardList() {
+            return JsonConvert.SerializeObject(new ChesterDatabase.ChesterMySQL().getAllCardInShop());
+        }
+
+        //untuk ngacak otomatis item yang dijual di shop
+        [HttpPut]
+        [Route("shuffle")]
+        public string ShuffleCard() {
+            var res = new ChesterDatabase.ChesterMySQL().ShuffleCard();
+            if (res) return "sukses";
+            else return "gagal";
         }
     }
 
@@ -126,33 +240,9 @@ namespace chesterBackendNet31.Controllers
 
         [HttpGet]
         public JsonResult Get() {
-            
-            string dbSocketDir = Environment.GetEnvironmentVariable("DB_SOCKET_PATH") ?? "/cloudsql";
-            string instanceConnectionName = Environment.GetEnvironmentVariable("INSTANCE_CONNECTION_NAME");
-            string UserID = Environment.GetEnvironmentVariable("DB_USER");   // e.g. 'my-db-user
-            string Password = Environment.GetEnvironmentVariable("DB_PASS");
-            string Database = Environment.GetEnvironmentVariable("DB_NAME");
             return new JsonResult(
-                new Dictionary<string, string> { { "dbSocketDir", dbSocketDir }, { "instanceConnectionName", instanceConnectionName }, { "UserID", UserID }, { "Password", Password }, { "Database", Database }, {"Connection String", ChesterDatabase.ChesterMySQL.getConnectionString() } }
+                new Dictionary<string, string> { {"Error: ", "404" } }
             );
-            /*
-            string ret = "";
-            var connection = new MySqlConnection(ChesterDatabase.ChesterMySQL.getConnectionString());
-
-            try
-            {
-                connection.Open();
-                ret = "berhasil";
-            }
-            catch(Exception e)
-            {
-                ret = e.StackTrace;
-            }
-
-            ret += "\n\n"+Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
-            ret += "\n\n" + "Connection string = "+ ChesterDatabase.ChesterMySQL.getConnectionString();
-
-            return ret;*/
         }
     }
 
