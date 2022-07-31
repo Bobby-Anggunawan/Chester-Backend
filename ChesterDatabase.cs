@@ -50,8 +50,22 @@ namespace chesterBackendNet31
                     Int64 isExist = (Int64)cmd.ExecuteScalar();
 
                     if (isExist != 1L) {
-                        cmd.CommandText = $"insert into user values('{userID}', 0)";
+                        cmd.CommandText = $"insert into user values('{userID}', 500)";
                         cmd.ExecuteNonQuery();
+
+                        //=============================
+                        //kasih kartu ke user baru
+                        cmd = new MySqlCommand(@$"insert into CardOwnership values  (NULL, '0001', '{userID}', 3),
+                                                                                    (NULL, '0002', '{userID}', 3),
+                                                                                    (NULL, '0003', '{userID}', 3),
+                                                                                    (NULL, '0004', '{userID}', 3),
+                                                                                    (NULL, '0005', '{userID}', 3),
+                                                                                    (NULL, '0006', '{userID}', 3),
+                                                                                    (NULL, '0007', '{userID}', 20)", connection);
+                        cmd.ExecuteNonQuery();
+                        //=============================
+
+                        closeConnection();
                         return true;
                     }
 
@@ -250,7 +264,7 @@ namespace chesterBackendNet31
                 List<Dictionary<string, object>> ret = new List<Dictionary<string, object>>();
                 if (openConnection())
                 {
-                    MySqlCommand cmd = new MySqlCommand($"select * from Shop", connection);
+                    MySqlCommand cmd = new MySqlCommand($"select Shop.CardID, Shop.Discount, Card.MarketPrice from Shop inner join Card on Shop.CardID=Card.CardID", connection);
 
                     MySqlDataReader dataReader = cmd.ExecuteReader();
                     while (dataReader.Read())
@@ -259,6 +273,7 @@ namespace chesterBackendNet31
                         {
                             { "CardID", dataReader["CardID"] },
                             { "Discount", dataReader["Discount"] },
+                            { "MarketPrice", dataReader["MarketPrice"] },
                         });
                     }
 
