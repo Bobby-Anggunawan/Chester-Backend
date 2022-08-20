@@ -109,22 +109,21 @@ namespace chesterBackendNet31.Controllers
         //dipanggil untuk login
         [HttpPost]
         [Route("login/{userID}")]
-        public String UserLogin(string userID) {
+        public JsonResult UserLogin(string userID) {
             try {
                 var data = new ChesterDatabase.ChesterMySQL().addUser(userID);
-                if (data) return "user berhasil dirambah";
-                return "user gagal dittambah";
+                return new JsonResult(new Dictionary<string, object>() { { "userID", userID }, {"coin", data } });
             }
-            catch(Exception e){
-                return e.Message;
+            catch{
+                return new JsonResult(new Dictionary<string, object>() { { "userID", userID }, { "coin", -3 } });
             }
         }
 
         //dipanggil untuk menambah koin
         [HttpPut]
-        [Route("addCoin/{userID}/{coin:int}")]
-        public String TambahKoinUser(string userID, int coin) {
-            var data = new ChesterDatabase.ChesterMySQL().addUserCoin(userID, coin);
+        [Route("addCoin/{userID}/{coin}")]
+        public String TambahKoinUser(string userID, string coin) {
+            var data = new ChesterDatabase.ChesterMySQL().addUserCoin(userID, Convert.ToInt32(coin));
             if (data) return "koin ditambah";
             return "koin gagal ditambah";
         }

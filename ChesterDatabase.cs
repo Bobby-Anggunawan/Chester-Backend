@@ -40,8 +40,9 @@ namespace chesterBackendNet31
                 connection.Close();
             }
 
-            //kalau return true artinya sukses
-            public bool addUser(string userID) {
+            //kalau return -1 artinya gagal
+            //ini return jumlah koin user yang login
+            public int addUser(string userID) {
 
                 if (openConnection()) {
                     MySqlCommand cmd = new MySqlCommand();
@@ -49,7 +50,8 @@ namespace chesterBackendNet31
                     cmd.Connection = connection;
                     Int64 isExist = (Int64)cmd.ExecuteScalar();
 
-                    if (isExist != 1L) {
+                    if (isExist != 1L)
+                    {
                         cmd.CommandText = $"insert into user values('{userID}', 500)";
                         cmd.ExecuteNonQuery();
 
@@ -66,12 +68,16 @@ namespace chesterBackendNet31
                         //=============================
 
                         closeConnection();
-                        return true;
+                        return 500;
                     }
-
-                    closeConnection();
+                    else {
+                        cmd.CommandText = $"select coin from user where userID='{userID}'";
+                        int jlhKoin = Convert.ToInt32(cmd.ExecuteScalar());
+                        closeConnection();
+                        return jlhKoin;
+                    }
                 }
-                return false;
+                return -1;
             }
 
             public bool addUserCoin(string userID, int newCoin) {
